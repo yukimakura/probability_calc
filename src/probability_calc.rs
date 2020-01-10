@@ -4,12 +4,19 @@ extern crate gnuplot;
 use csv_import::csv_parse;
 use std::error::Error;
 
-use gnuplot::{Figure, Color};
+use gnuplot::*;
 
 #[derive(Debug)]
 pub struct PROBABILITY{
     pub element :i32,
     pub probability :f64
+}
+#[derive(Debug)]
+pub struct AXIS_RANGE{
+    pub x_max :f64,
+    pub x_min :f64,
+    pub y_max :f64,
+    pub y_min :f64,
 }
 
 pub fn calc_probabries_ir_with_time(input_vec : Vec<csv_parse::SCANDATA>) -> Result<Vec<Vec<PROBABILITY>>, Box<dyn Error>>{
@@ -112,8 +119,7 @@ pub fn calc_probabries_lidar(input_vec : &Vec<csv_parse::SCANDATA>,max_size : us
     Ok(probs)
 }
 
-pub fn plot(datas : &Vec<PROBABILITY>) {
-    let mut fg = Figure::new();
+pub fn plot(datas : &Vec<PROBABILITY>,fg : &mut Figure , color : String,caption : String, axis_info : &AXIS_RANGE){
     let mut x : Vec<i32> = Vec::new();
     let mut y : Vec<f64> = Vec::new();
     for item in datas {
@@ -121,9 +127,10 @@ pub fn plot(datas : &Vec<PROBABILITY>) {
         y.push(item.probability);
     }
 
-    fg.axes2d().lines(&x, &y, &[Color("blue")]); //xはポインタで受けてるので&がない.
+    fg.axes2d()
+        .set_x_range(Fix(axis_info.x_min), Fix(axis_info.x_max))
+        .set_y_range(Fix(axis_info.y_min),Fix(axis_info.y_max))
+        .lines_points(&x, &y, &[Color(&color)])
+        .set_x_axis(true, &[]);
 
-    // "png" 設定で画像を保存する.
-    // fg.set_terminal("png", "NormalDistribution.png");
-    fg.show();
 }

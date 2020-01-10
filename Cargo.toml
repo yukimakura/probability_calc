@@ -9,4 +9,4 @@ license = "MIT"
 
 [dependencies]
 csv_import = { git = "https://github.com/yukimakura/csv_import.git", branch = "crate_version" }
-gnuplot = "*"
+gnuplot = "0.0.33"
